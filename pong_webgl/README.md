@@ -17,8 +17,8 @@ As tecnologias utilizadas no projeto foram:
 
 ### 1. Tela inicial
 
-![Tela Inicial](/imgs/tela_inicial.png)
+![Tela Inicial](./imgs/tela_inicial.png)
 
 ### 2. Final do Jogo
 
-![Tela Final](/imgs/end_game.png)
+![Tela Final](./imgs/end_game.png)
