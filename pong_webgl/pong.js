@@ -1,11 +1,14 @@
 let canvas = document.querySelector('canvas');
-let ctx = canvas.getContext('2d');
+let canvasContext = canvas.getContext('2d');
+
+// Definindo background como preto
 canvas.style.background = 'black';
+
 let dirX = true;
 let dirY = true;
 
 // Definição das raquetes
-let Pad1YPos, Pad2YPos;
+let pad1YPos, pad2YPos;
 
 let RequestFrame = false;
 let ballAnimation = 0;
@@ -26,6 +29,7 @@ let ballSpeed = 8; // Valor padrão para Normal
 // Verificando se jogo está ativo
 let isGameActive = false;
 
+// Definição da cor do projeto
 let chosenColor = '#30a25f';
 
 // Elementos do menu
@@ -33,6 +37,7 @@ const difficultySelect = document.getElementById('difficultySelect');
 const startButton = document.getElementById('startButton');
 const menu = document.getElementById('Menu');
 
+// Mapeamento para evitar key ghosting
 document.addEventListener('keydown', (e) => {
   if (e.key == 'w') WKeyState = true;
   if (e.key == 's') SKeyState = true;
@@ -45,6 +50,7 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
+// Mapeamento para evitar key ghosting
 document.addEventListener('keyup', (e) => {
   if (e.key == 'w') WKeyState = false;
   if (e.key == 's') SKeyState = false;
@@ -63,10 +69,11 @@ function startGame() {
   let ball = new Obj(DocWidth / 2, DocHeight / 2, 10);
   ball.drawBall();
   RequestFrame = true;
-  MoveBallLoop(ball);
+  ballLoopMovement(ball);
 }
 
 class Obj {
+  // Construtor Base
   constructor(x, y, radius, height) {
     this.color = `${chosenColor}`;
     this.x = x;
@@ -76,19 +83,22 @@ class Obj {
     this.speed = ballSpeed;
   }
 
+  // Método desenha Bola
   drawBall() {
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-    ctx.fillStyle = this.color;
-    ctx.fill();
-    ctx.closePath();
+    canvasContext.beginPath();
+    canvasContext.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+    canvasContext.fillStyle = this.color;
+    canvasContext.fill();
+    canvasContext.closePath();
   }
 
+  // Método desenha raquete (pad)
   drawPad() {
-    ctx.fillRect(this.x, this.y, this.radius, this.height);
-    ctx.fillStyle = this.color;
+    canvasContext.fillRect(this.x, this.y, this.radius, this.height);
+    canvasContext.fillStyle = this.color;
   }
 
+  // Método mover bola
   moveBall() {
     if (dirY) this.y += this.speed;
     if (dirX) this.x += this.speed;
@@ -96,40 +106,46 @@ class Obj {
     if (!dirX) this.x -= this.speed;
     if (this.y > DocHeight) dirY = false;
     if (this.x > DocWidth) {
-      dirX = GenerateRandomDir();
-      dirY = GenerateRandomDir();
+      dirX = genRandomDirection();
+      dirY = genRandomDirection();
+
       this.y = DocHeight / 2;
       this.x = DocWidth / 2;
+
       Score1++;
       RequestFrame = false;
-      ctx.clearRect(0, 0, DocWidth + 100, DocHeight);
-      DrawPads(Pad1YPos, Pad2YPos);
-      ctx.fillRect(DocWidth / 2 - 5, 0, 10, DocHeight);
-      ctx.fillStyle = `${chosenColor}`;
-      ctx.fill();
-      this.drawBall();
-    }
-    if (this.y < 0) dirY = true;
-    if (this.x < 0) {
-      dirX = GenerateRandomDir();
-      dirY = GenerateRandomDir();
-      this.y = DocHeight / 2;
-      this.x = DocWidth / 2;
-      Score2++;
-      RequestFrame = false;
-      ctx.clearRect(0, 0, DocWidth + 100, DocHeight);
-      DrawPads(Pad1YPos, Pad2YPos);
-      ctx.fillRect(DocWidth / 2 - 5, 0, 10, DocHeight);
-      ctx.fillStyle = `${chosenColor}`;
-      ctx.fill();
+      canvasContext.clearRect(0, 0, DocWidth + 100, DocHeight);
+      drawPads(pad1YPos, pad2YPos);
+      canvasContext.fillRect(DocWidth / 2 - 5, 0, 10, DocHeight);
+      canvasContext.fillStyle = `${chosenColor}`;
+      canvasContext.fill();
       this.drawBall();
     }
 
-    ctx.clearRect(0, 0, DocWidth + 100, DocHeight);
-    DrawPads(Pad1YPos, Pad2YPos);
-    ctx.fillRect(DocWidth / 2 - 5, 0, 10, DocHeight);
-    ctx.fillStyle = `${chosenColor}`;
-    ctx.fill();
+    if (this.y < 0) dirY = true;
+
+    if (this.x < 0) {
+      dirX = genRandomDirection();
+      dirY = genRandomDirection();
+
+      this.y = DocHeight / 2;
+      this.x = DocWidth / 2;
+
+      Score2++;
+      RequestFrame = false;
+      canvasContext.clearRect(0, 0, DocWidth + 100, DocHeight);
+      drawPads(pad1YPos, pad2YPos);
+      canvasContext.fillRect(DocWidth / 2 - 5, 0, 10, DocHeight);
+      canvasContext.fillStyle = `${chosenColor}`;
+      canvasContext.fill();
+      this.drawBall();
+    }
+
+    canvasContext.clearRect(0, 0, DocWidth + 100, DocHeight);
+    drawPads(pad1YPos, pad2YPos);
+    canvasContext.fillRect(DocWidth / 2 - 5, 0, 10, DocHeight);
+    canvasContext.fillStyle = `${chosenColor}`;
+    canvasContext.fill();
     this.drawBall();
     checkCollision(this.y, this.x);
     document.querySelector('#Player1').innerHTML = `${Score1}/10`;
@@ -143,23 +159,23 @@ window.onresize = canvasSetup;
 function canvasSetup() {
   DocHeight = window.innerHeight;
   DocWidth = window.innerWidth;
-  Pad2YPos = DocHeight / 2;
-  Pad1YPos = DocHeight / 2;
+  pad2YPos = DocHeight / 2;
+  pad1YPos = DocHeight / 2;
   canvas.height = DocHeight;
   canvas.width = DocWidth;
-  dirX = GenerateRandomDir();
-  dirY = GenerateRandomDir();
-  DrawPads(Pad1YPos, Pad2YPos);
+  dirX = genRandomDirection();
+  dirY = genRandomDirection();
+  drawPads(pad1YPos, pad2YPos);
   let ball = new Obj(DocWidth / 2, DocHeight / 2, 10);
   ball.drawBall();
-  ctx.fillRect(DocWidth / 2 - 5, 0, 10, DocHeight);
-  ctx.fillStyle = `${chosenColor}`;
-  ctx.fill();
+  canvasContext.fillRect(DocWidth / 2 - 5, 0, 10, DocHeight);
+  canvasContext.fillStyle = `${chosenColor}`;
+  canvasContext.fill();
 }
 
-function DrawPads(Pad1YPos, Pad2YPos) {
-  let Pad1 = new Obj(50, Pad1YPos, 25, 100);
-  let Pad2 = new Obj(DocWidth - 50, Pad2YPos, 25, 100);
+function drawPads(pad1YPos, pad2YPos) {
+  let Pad1 = new Obj(50, pad1YPos, 25, 100);
+  let Pad2 = new Obj(DocWidth - 50, pad2YPos, 25, 100);
 
   Pad1.drawPad();
   Pad2.drawPad();
@@ -170,19 +186,19 @@ canvas.onclick = () => {
     let ball = new Obj(DocWidth / 2, DocHeight / 2, 10);
     ball.drawBall();
     RequestFrame = true;
-    MoveBallLoop(ball);
+    ballLoopMovement(ball);
   }
 };
 
-function MoveBallLoop(ball) {
-  if (WKeyState && Pad1YPos > 0) Pad1YPos -= 10;
-  if (SKeyState && Pad1YPos < window.innerHeight - 100) Pad1YPos += 10;
-  if (OKeyState && Pad2YPos > 0) Pad2YPos -= 10;
-  if (LKeyState && Pad2YPos < window.innerHeight - 100) Pad2YPos += 10;
+function ballLoopMovement(ball) {
+  if (WKeyState && pad1YPos > 0) pad1YPos -= 10;
+  if (SKeyState && pad1YPos < window.innerHeight - 100) pad1YPos += 10;
+  if (OKeyState && pad2YPos > 0) pad2YPos -= 10;
+  if (LKeyState && pad2YPos < window.innerHeight - 100) pad2YPos += 10;
   ball.moveBall();
   if (RequestFrame)
     requestAnimationFrame(() => {
-      MoveBallLoop(ball);
+      ballLoopMovement(ball);
     });
 }
 
@@ -191,7 +207,7 @@ function checkCollision(ballY, ballX) {
   let LoclPad1XPos = 50 + 12.5;
   distance1 = Math.abs(ballX - LoclPad1XPos);
 
-  if (distance1 < 5 && ballY > Pad1YPos - 50 && Pad1YPos + 100 > ballY)
+  if (distance1 < 5 && ballY > pad1YPos - 50 && pad1YPos + 100 > ballY)
     dirX = true;
 
   ballX = ballX + 10;
@@ -199,7 +215,7 @@ function checkCollision(ballY, ballX) {
   let LoclPad2XPos = DocWidth - 50;
   distance2 = Math.abs(ballX - LoclPad2XPos);
 
-  if (distance2 < 5 && ballY > Pad2YPos - 50 && Pad2YPos + 100 > ballY)
+  if (distance2 < 5 && ballY > pad2YPos - 50 && pad2YPos + 100 > ballY)
     dirX = false;
 
   if (Score1 > 9) {
@@ -218,6 +234,6 @@ function checkCollision(ballY, ballX) {
   }
 }
 
-function GenerateRandomDir() {
+function genRandomDirection() {
   return Boolean(Math.floor(Math.random() * 2));
 }
