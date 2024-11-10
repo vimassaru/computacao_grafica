@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jogo: Ping Pong D2</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div id="ScoreDiv">
+    <p id="Player1">0/10</p>
+    <p id="Player2">0/10</p>
+  </div>
+
+  <canvas></canvas>
+
+  <div id="WinMsg">
+    <p>Jogador <span id="WinPlayerId"></span> Ganhou o Jogo.</p>
+    <button onclick=location.reload()>Jogar Novamente</button>
+  </div>
+
+  <!-- Menu Inicial -->
+  <div id="Menu">
+    <h1>Ping Pong D2</h1>
+    <label for="difficultySelect">Escolha a Dificuldade:</label>
+    <select id="difficultySelect">
+      <option value="4">Fácil</option>
+      <option value="8" selected>Normal</option>
+      <option value="12">Difícil</option>
+    </select>
+    <p>Controles:</p>
+    <ul>
+      <li>Jogador 1: W (cima), S (baixo)</li>
+      <li>Jogador 2: ↑ (cima), ↓ (baixo)</li>
+      <li>Pressione Enter para Iniciar</li>
+    </ul>
+    <button id="startButton">Iniciar Jogo</button>
+  </div>
+
+  <script src="pong.js"></script>
+</body>
+
+</html>
